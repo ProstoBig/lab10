@@ -1,4 +1,5 @@
 package lab10;
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -17,6 +18,8 @@ public class menu {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         boolean running = true;
+        String desktopPath = System.getProperty("user.home") + File.separator + "Desktop";
+        String filePath = desktopPath + File.separator + "contacts.txt";
 
         while (running) {
             System.out.println("--------------------------");
@@ -37,6 +40,12 @@ public class menu {
                     System.out.println("Enter name:");
                     String name = scanner.nextLine();
 
+                    /** Перевірка наявності імені у списку контактів перед додаванням **/
+                    if (Contact.isNameExists(filePath, name)) {
+                        System.out.println("Name already exists. Contact not added.");
+                        break;
+                    }
+
                     System.out.println("Enter birth date:");
                     String birthDate = scanner.nextLine();
 
@@ -54,7 +63,7 @@ public class menu {
                     String editName = scanner.nextLine();
 
                     try {
-                        byte[] fileBytes = Files.readAllBytes(Paths.get("C:\\Users\\Олександр\\Desktop\\contacts.txt"));
+                        byte[] fileBytes = Files.readAllBytes(Paths.get(filePath));
                         String fileContent = new String(fileBytes, StandardCharsets.UTF_8);
 
                         if (fileContent.contains(editName)) {
@@ -70,7 +79,7 @@ public class menu {
                             Contact updatedContact = new Contact(newName, newBirthDate, newPhoneNumber);
 
                             String updatedFileContent = fileContent.replaceAll(editName + ",.*", updatedContact.getName() + "," + updatedContact.getBirthDate() + "," + updatedContact.getPhoneNumber());
-                            Files.write(Paths.get("C:\\Users\\Олександр\\Desktop\\contacts.txt"), updatedFileContent.getBytes());
+                            Files.write(Paths.get(filePath), updatedFileContent.getBytes());
                             System.out.println("Contact updated successfully.");
                         } else {
                             System.out.println("Contact not found.");
@@ -85,12 +94,12 @@ public class menu {
                     String deleteName = scanner.nextLine();
 
                     try {
-                        byte[] fileBytes = Files.readAllBytes(Paths.get("C:\\Users\\Олександр\\Desktop\\contacts.txt"));
+                        byte[] fileBytes = Files.readAllBytes(Paths.get(filePath));
                         String fileContent = new String(fileBytes, StandardCharsets.UTF_8);
 
                         if (fileContent.contains(deleteName)) {
                             String updatedFileContent = fileContent.replaceAll(deleteName + ",.*\n", "");
-                            Files.write(Paths.get("C:\\Users\\Олександр\\Desktop\\contacts.txt"), updatedFileContent.getBytes());
+                            Files.write(Paths.get(filePath), updatedFileContent.getBytes());
                             System.out.println("Contact deleted successfully.");
                         } else {
                             System.out.println("Contact not found.");
@@ -102,7 +111,7 @@ public class menu {
                 case 4:
                     /**Код для показу списку контактів**/
                     try {
-                        byte[] fileBytes = Files.readAllBytes(Paths.get("C:\\Users\\Олександр\\Desktop\\contacts.txt"));
+                        byte[] fileBytes = Files.readAllBytes(Paths.get(filePath));
                         String fileContent = new String(fileBytes, StandardCharsets.UTF_8);
 
                         if (!fileContent.isEmpty()) {
